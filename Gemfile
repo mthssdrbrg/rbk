@@ -1,8 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'aws-sdk'
-gem 'github_api'
-gem 'git'
+gemspec
 
 group :test do
   gem 'rspec'
