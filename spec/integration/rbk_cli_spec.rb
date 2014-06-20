@@ -106,6 +106,7 @@ describe 'rbk integration test' do
       cloned = clone_archive(path, data)
       expect(cloned.log.size).to eq(1)
       expect(cloned.log.first.message).to eq('Initial commit')
+      expect(File.read(File.join(cloned.dir.path, 'README'))).to eq("hello world\n")
     end
   end
 end
