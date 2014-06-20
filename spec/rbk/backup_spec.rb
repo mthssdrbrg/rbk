@@ -70,6 +70,25 @@ module Rbk
         end
       end
 
+      context 'errors during Git#clone' do
+        before do
+          repos.stub(:each)
+            .and_yield(FakeRepo.new('fail-repo', 'git@github.com/org/fail-repo.git'))
+            .and_yield(FakeRepo.new('repo', 'git@github.com/org/repo.git'))
+
+            git.stub(:clone).with('git@github.com/org/fail-repo.git', anything, anything).and_raise(Git::GitExecuteError)
+        end
+
+        before do
+          backup.run
+        end
+
+        it 'ignores them' do
+          expect(git).to have_received(:clone).twice
+          expect(uploader).to have_received(:upload).once
+          expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git.tar.gz$/)
+          expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git$/)
+        end
       end
     end
   end
