@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+FakeRepo = Struct.new(:name, :ssh_url)
+
 require 'simplecov'
 
 SimpleCov.start do

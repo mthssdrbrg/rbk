@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 
-FakeRepo = Struct.new(:name, :ssh_url)
 describe 'rbk integration test' do
   let :run_cli do
     Rbk::Cli.run(%w[], github_repos: github_repos, s3: s3)
