@@ -8,7 +8,7 @@ module Rbk
       @archiver = archiver
       @uploader = uploader
       @fileutils = fileutils
-      @date_suffix ||= Date.today.strftime('%Y%m%d')
+      @date_suffix = Date.today.strftime('%Y%m%d')
     end
 
     def run
