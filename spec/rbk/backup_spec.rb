@@ -40,32 +40,36 @@ module Rbk
         fileutils.stub(:remove_entry_secure)
       end
 
-      before do
-        backup.run
+      context 'without any errors' do
+        before do
+          backup.run
+        end
+
+        it 'clones each repo' do
+          expect(git).to have_received(:clone)
+        end
+
+        it 'clones w/ `bare` option' do
+          expect(git).to have_received(:clone).with(anything, anything, bare: true)
+        end
+
+        it 'creates a tar archive of each cloned repo' do
+          expect(archiver).to have_received(:create)
+        end
+
+        it 'uploads each tar archive' do
+          expect(uploader).to have_received(:upload)
+        end
+
+        it 'removes each tar archive' do
+          expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git.tar.gz$/)
+        end
+
+        it 'removes each cloned repo (locally)' do
+          expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git$/)
+        end
       end
 
-      it 'clones each repo' do
-        expect(git).to have_received(:clone)
-      end
-
-      it 'clones w/ `bare` option' do
-        expect(git).to have_received(:clone).with(anything, anything, bare: true)
-      end
-
-      it 'creates a tar archive of each cloned repo' do
-        expect(archiver).to have_received(:create)
-      end
-
-      it 'uploads each tar archive' do
-        expect(uploader).to have_received(:upload)
-      end
-
-      it 'removes each tar archive' do
-        expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git.tar.gz$/)
-      end
-
-      it 'removes each cloned repo (locally)' do
-        expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git$/)
       end
     end
   end
