@@ -231,6 +231,13 @@ module Rbk
       end
     end
 
+    context '#aws_credentials' do
+      it 'returns a hash with configured AWS credentials' do
+        configuration = described_class.new.parse(%w[-A KEY_ID -S SECRET])
+        expect(configuration.aws_credentials).to eq({access_key_id: 'KEY_ID', secret_access_key: 'SECRET'})
+      end
+    end
+
     context 'when calling a method that is not a configuration option' do
       it 'raises NoMethodError' do
         expect { described_class.new.something }.to raise_error(NoMethodError)

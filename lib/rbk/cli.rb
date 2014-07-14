@@ -10,7 +10,6 @@ module Rbk
       @argv = argv
       @options = options
       @git = @options[:git] || Git
-      @s3 = @options[:s3] || AWS::S3.new
       @github = @options[:github_repos] || Github::Repos
     end
 
@@ -18,6 +17,7 @@ module Rbk
       @config = Configuration.parse(@argv)
       @shell = @options[:shell] || Shell.new(@config.quiet?)
       @archiver = Archiver.new(@shell)
+      @s3 = @options[:s3] || AWS::S3.new(@config.aws_credentials)
       @uploader = Uploader.new(@s3.buckets[@config.bucket], @shell)
       self
     end

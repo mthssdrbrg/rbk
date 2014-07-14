@@ -58,6 +58,13 @@ module Rbk
       @parser.to_s
     end
 
+    def aws_credentials
+      {
+        access_key_id: @config['aws_access_key_id'],
+        secret_access_key: @config['aws_secret_access_key']
+      }
+    end
+
     private
 
     def invalid_option?(value, message)
