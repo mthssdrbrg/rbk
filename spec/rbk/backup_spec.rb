@@ -7,7 +7,7 @@ module Rbk
   describe Backup do
     describe '#run' do
       let :backup do
-        described_class.new(repos, git, archiver, uploader, fileutils)
+        described_class.new(repos, git, archiver, uploader, shell, fileutils)
       end
 
       let :repos do
@@ -26,6 +26,10 @@ module Rbk
         double(:uploader)
       end
 
+      let :shell do
+        double(:shell)
+      end
+
       let :fileutils do
         double(:fileutils)
       end
@@ -38,6 +42,7 @@ module Rbk
         end
         uploader.stub(:upload)
         fileutils.stub(:remove_entry_secure)
+        shell.stub(:puts)
       end
 
       context 'without any errors' do
@@ -47,6 +52,10 @@ module Rbk
 
         it 'clones each repo' do
           expect(git).to have_received(:clone)
+        end
+
+        it 'prints a message for each repo' do
+          expect(shell).to have_received(:puts).with(/Cloning "repo" to "repo-\d+\.git/)
         end
 
         it 'clones w/ `bare` option' do
@@ -88,6 +97,10 @@ module Rbk
           expect(uploader).to have_received(:upload).once
           expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git.tar.gz$/)
           expect(fileutils).to have_received(:remove_entry_secure).with(/^repo-[0-9]{8}.git$/)
+        end
+
+        it 'prints a message about failed clone attempt' do
+          expect(shell).to have_received(:puts).with('Failed to clone "fail-repo"')
         end
       end
     end

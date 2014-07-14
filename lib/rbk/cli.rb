@@ -17,7 +17,7 @@ module Rbk
 
     def setup
       @config = Configuration.parse(@argv)
-      @archiver = Archiver.new(@shell)
+      @archiver = Archiver.new(shell)
       @uploader = Uploader.new(@s3.buckets[@config.bucket])
       self
     end
@@ -26,13 +26,13 @@ module Rbk
       if @config.help?
         @shell.puts(@config.usage)
       else
-        Backup.new(repos, git, archiver, uploader).run
+        Backup.new(repos, git, archiver, uploader, shell).run
       end
     end
 
     private
 
-    attr_reader :git, :archiver, :uploader
+    attr_reader :git, :archiver, :uploader, :shell
 
     def repos
       @repos ||= begin
