@@ -33,7 +33,7 @@ describe 'rbk integration test' do
   end
 
   let :shell do
-    Rbk::Shell.new(stream)
+    Rbk::Shell.new(false, stream)
   end
 
   let :stream do

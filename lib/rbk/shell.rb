@@ -2,12 +2,13 @@
 
 module Rbk
   class Shell
-    def initialize(stream=$stdout)
+    def initialize(quiet=false, stream=$stdout)
+      @quiet = quiet
       @stream = stream
     end
 
     def puts(message)
-      @stream.puts(message)
+      @stream.puts(message) unless @quiet
     end
 
     def exec(command)

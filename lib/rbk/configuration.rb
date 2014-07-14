@@ -50,6 +50,10 @@ module Rbk
       @config['show_help']
     end
 
+    def quiet?
+      @config['quiet']
+    end
+
     def usage
       @parser.to_s
     end
@@ -69,6 +73,7 @@ module Rbk
         'bucket' => nil,
         'github_access_token' => ENV['GITHUB_ACCESS_TOKEN'],
         'organization' => nil,
+        'quiet' => false,
         'show_help' => false,
       }
     end
@@ -93,6 +98,10 @@ module Rbk
 
         opt.on('-S KEY', '--secret-access-key=KEY', 'AWS secret access key') do |key|
           @cli_options['aws_secret_access_key'] = key
+        end
+
+        opt.on('-q', '--quiet', 'Be quiet and mind your own business') do |key|
+          @cli_options['quiet'] = key
         end
 
         opt.on('-h', '--help', 'Display this screen') do

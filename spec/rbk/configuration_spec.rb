@@ -113,6 +113,14 @@ module Rbk
         end
       end
 
+      context '-q / --quiet' do
+        it 'sets quiet flag' do
+          config.parse(%w[-q])
+          expect(config.quiet).to be_true
+          expect(config.quiet?).to be_true
+        end
+      end
+
       context '-h / --help' do
         it 'sets `show_help` to true' do
           config.parse(%w[-h])
