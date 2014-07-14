@@ -12,30 +12,38 @@ module Rbk
       @git = @options[:git] || Git
       @s3 = @options[:s3] || AWS::S3.new
       @github = @options[:github_repos] || Github::Repos
+      @shell = @options[:shell] || Shell.new
     end
 
     def setup
-      config = Configuration.parse(@argv)
-      @repos = list_repos(config)
-      @archiver = Archiver.new
-      @uploader = Uploader.new(@s3.buckets[config.bucket])
+      @config = Configuration.parse(@argv)
+      @archiver = Archiver.new(@shell)
+      @uploader = Uploader.new(@s3.buckets[@config.bucket])
       self
     end
 
     def run
-      Backup.new(@repos, @git, @archiver, @uploader).run
+      if @config.help?
+        @shell.puts(@config.usage)
+      else
+        Backup.new(repos, git, archiver, uploader).run
+      end
     end
 
     private
 
-    def list_repos(config)
-      r = @github.new(oauth_token: config.github_access_token)
-      r.list(org: config.organization, auto_pagination: true)
+    attr_reader :git, :archiver, :uploader
+
+    def repos
+      @repos ||= begin
+        r = @github.new(oauth_token: @config.github_access_token)
+        r.list(org: @config.organization, auto_pagination: true)
+      end
     end
 
     class Archiver
-      def initialize
-        @shell = Shell.new
+      def initialize(shell=Shell.new)
+        @shell = shell
       end
 
       def create(path)

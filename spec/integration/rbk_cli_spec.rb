@@ -5,7 +5,11 @@ require 'spec_helper'
 
 describe 'rbk integration test' do
   let :run_cli do
-    Rbk::Cli.run(%w[], github_repos: github_repos, s3: s3)
+    Rbk::Cli.run(argv, github_repos: github_repos, s3: s3, shell: shell)
+  end
+
+  let :argv do
+    %w[]
   end
 
   let :github_repos do
@@ -29,7 +33,19 @@ describe 'rbk integration test' do
   end
 
   let :shell do
-    Rbk::Shell.new
+    Rbk::Shell.new(stream)
+  end
+
+  let :stream do
+    s = double(:stream)
+    s.stub(:puts) do |message|
+      messages << message
+    end
+    s
+  end
+
+  let :messages do
+    []
   end
 
   let :uploaded_repos do
@@ -43,23 +59,24 @@ describe 'rbk integration test' do
   end
 
   def setup_repo
-    shell.exec 'git init --bare remote-repo.git'
+    %x(git init --bare remote-repo.git)
 
     Dir.mkdir('spec-repo')
     Dir.chdir('spec-repo') do
-      shell.exec [
+      commands = [
         'git init',
         'echo "hello world" >> README',
         'git add . && git commit -m "Initial commit"',
         'git remote add origin ../remote-repo.git',
         'git push -u origin master',
       ].join(' && ') << ' > /dev/null 2>&1'
+      %x(#{commands})
     end
   end
 
   def clone_archive(path, data)
     File.open(path, 'w') { |f| f.write(data) }
-    shell.exec %(tar xzf #{path})
+    %x(tar xzf #{path})
     Git.clone(path.basename('.tar.gz'), path.basename('.git.tar.gz'))
   end
 
@@ -87,7 +104,7 @@ describe 'rbk integration test' do
   around do |example|
     Dir.mktmpdir do |sandbox_dir|
       Dir.chdir(sandbox_dir) do
-        setup_repo
+        setup_repo if example.metadata[:setup_git]
         write_config_file
         example.call
       end
@@ -98,7 +115,7 @@ describe 'rbk integration test' do
     run_cli
   end
 
-  it 'clones, compresses and uploads repos' do
+  it 'clones, compresses and uploads repos', setup_git: true do
     expect(uploaded_repos.size).to eq(1)
     uploaded_repos.each do |path, data|
       expect(path).to_not exist
@@ -106,6 +123,16 @@ describe 'rbk integration test' do
       expect(cloned.log.size).to eq(1)
       expect(cloned.log.first.message).to eq('Initial commit')
       expect(File.read(File.join(cloned.dir.path, 'README'))).to eq("hello world\n")
+    end
+  end
+
+  context 'when given -h / --help' do
+    let :argv do
+      %w[--help]
+    end
+
+    it 'prints usage' do
+      expect(messages.first).to match /Usage:/
     end
   end
 end

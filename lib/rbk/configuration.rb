@@ -25,7 +25,7 @@ module Rbk
       end
     end
 
-    def parse(argv, out=$stdout)
+    def parse(argv)
       @parser.parse(argv)
       @config.merge!(@cli_options)
       self
@@ -46,10 +46,18 @@ module Rbk
       end
     end
 
+    def help?
+      @config['show_help']
+    end
+
+    def usage
+      @parser.to_s
+    end
+
     private
 
     def invalid_option?(value, message)
-      if !value || value.empty?
+      if !help? && (!value || value.empty?)
         raise InsufficientOptionsError, message
       end
     end
