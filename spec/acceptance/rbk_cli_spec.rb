@@ -90,8 +90,11 @@ describe 'rbk integration test' do
   before do
     s3.stub_chain(:buckets, :[]).with('spec-bucket') do
       double(:bucket).tap do |bucket|
-        bucket.stub_chain(:objects, :[]) do
+        bucket.stub(:name).and_return(config['bucket'])
+        bucket.stub_chain(:objects, :[]) do |key|
           double(:s3_object).tap do |s3_object|
+            s3_object.stub(:key).and_return(key)
+            s3_object.stub(:exists?).and_return(false)
             s3_object.stub(:write) do |pathname|
               uploaded_repos << [pathname, pathname.read]
             end

@@ -18,7 +18,7 @@ module Rbk
     def setup
       @config = Configuration.parse(@argv)
       @archiver = Archiver.new(shell)
-      @uploader = Uploader.new(@s3.buckets[@config.bucket])
+      @uploader = Uploader.new(@s3.buckets[@config.bucket], shell)
       self
     end
 
@@ -50,18 +50,6 @@ module Rbk
         archive = %(#{path}.tar.gz)
         @shell.exec(%(tar czf #{archive} #{path}))
         archive
-      end
-    end
-
-    class Uploader
-      def initialize(bucket)
-        @bucket = bucket
-        @date_prefix = Date.today.strftime('%Y%m%d')
-      end
-
-      def upload(path)
-        s3_object = @bucket.objects[[@date_prefix, path].join('/')]
-        s3_object.write(Pathname.new(path))
       end
     end
   end
