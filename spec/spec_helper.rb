@@ -7,7 +7,7 @@ require 'simplecov'
 SimpleCov.start do
   add_group 'Source', 'lib'
   add_group 'Unit tests', 'spec/rbk'
-  add_group 'Integration tests', 'spec/integration'
+  add_group 'Acceptance tests', 'spec/acceptance'
 end
 
 RSpec.configure do |config|
