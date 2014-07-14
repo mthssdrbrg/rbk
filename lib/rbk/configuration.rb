@@ -7,7 +7,6 @@ module Rbk
   class Configuration
     def initialize(config={})
       @config = defaults.merge(config)
-      @cli_options = {}
       @parser = create_parser
     end
 
@@ -27,7 +26,6 @@ module Rbk
 
     def parse(argv)
       @parser.parse(argv)
-      @config.merge!(@cli_options)
       self
     end
 
@@ -88,31 +86,31 @@ module Rbk
     def create_parser
       OptionParser.new do |opt|
         opt.on('-o', '--organization=NAME', '(GitHub) Organization name') do |o|
-          @cli_options['organization'] = o
+          @config['organization'] = o
         end
 
         opt.on('-b', '--bucket=NAME', 'S3 bucket where to store backups') do |b|
-          @cli_options['bucket'] = b
+          @config['bucket'] = b
         end
 
         opt.on('-G TOKEN', '--github-access-token=TOKEN', 'GitHub access token') do |token|
-          @cli_options['github_access_token'] = token
+          @config['github_access_token'] = token
         end
 
         opt.on('-A KEY', '--access-key-id=KEY', 'AWS access key id') do |key|
-          @cli_options['aws_access_key_id'] = key
+          @config['aws_access_key_id'] = key
         end
 
         opt.on('-S KEY', '--secret-access-key=KEY', 'AWS secret access key') do |key|
-          @cli_options['aws_secret_access_key'] = key
+          @config['aws_secret_access_key'] = key
         end
 
         opt.on('-q', '--quiet', 'Be quiet and mind your own business') do |key|
-          @cli_options['quiet'] = key
+          @config['quiet'] = key
         end
 
         opt.on('-h', '--help', 'Display this screen') do
-          @cli_options['show_help'] = true
+          @config['show_help'] = true
         end
       end
     end
