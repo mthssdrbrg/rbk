@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.test_files    = Dir['spec/**/*.rb']
   s.executables   = %w[rbk]
 
-  s.add_dependency 'aws-sdk', '~> 1.38.0'
+  s.add_dependency 'aws-sdk', '~> 1.47.0'
   s.add_dependency 'github_api', '~> 0.11.3'
   s.add_dependency 'git', '~> 1.2.6'
 
