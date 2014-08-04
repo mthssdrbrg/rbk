@@ -46,11 +46,11 @@ module Rbk
     end
 
     def help?
-      @config['show_help']
+      !!@config['show_help']
     end
 
     def quiet?
-      @config['quiet']
+      !!@config['quiet']
     end
 
     def usage
