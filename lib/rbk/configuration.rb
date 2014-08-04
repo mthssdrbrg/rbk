@@ -5,23 +5,24 @@ require 'optparse'
 
 module Rbk
   class Configuration
+    def self.create(argv)
+      self.load.parse(argv).validate
+    end
+
+    def self.load
+      if File.exists?('.rbk.yml')
+        config = YAML.load_file('.rbk.yml')
+      elsif File.exists?(File.join(Dir.home, '.rbk.yml'))
+        config = YAML.load_file(File.join(Dir.home, '.rbk.yml'))
+      else
+        config = {}
+      end
+      new(config)
+    end
+
     def initialize(config={})
       @config = defaults.merge(config)
       @parser = create_parser
-    end
-
-    def self.parse(argv)
-      self.load_config.parse(argv).validate
-    end
-
-    def self.load_config
-      if File.exists?('.rbk.yml')
-        new(YAML.load_file('.rbk.yml'))
-      elsif File.exists?(File.join(Dir.home, '.rbk.yml'))
-        new(YAML.load_file(File.join(Dir.home, '.rbk.yml')))
-      else
-        new
-      end
     end
 
     def parse(argv)

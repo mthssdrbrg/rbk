@@ -131,9 +131,9 @@ module Rbk
       end
     end
 
-    context '.load_config' do
+    context '.load' do
       let :config do
-        described_class.load_config
+        described_class.load
       end
 
       around do |example|
@@ -195,14 +195,14 @@ module Rbk
       end
     end
 
-    context '.parse' do
+    context '.create' do
       it 'validates the resulting configuration' do
-        expect { described_class.parse(%w[]) }.to raise_error(InsufficientOptionsError)
+        expect { described_class.create(%w[]) }.to raise_error(InsufficientOptionsError)
       end
 
       context 'when there is a .rbk.yml somewhere' do
         let :config do
-          described_class.parse(%w[-o from-cmd-opts])
+          described_class.create(%w[-o from-cmd-opts])
         end
 
         let :options do

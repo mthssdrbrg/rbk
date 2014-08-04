@@ -14,7 +14,7 @@ module Rbk
     end
 
     def setup
-      @config = Configuration.parse(@argv)
+      @config = Configuration.create(@argv)
       @shell = @options[:shell] || Shell.new(@config.quiet?)
       @archiver = Archiver.new(@shell)
       @s3 = @options[:s3] || AWS::S3.new(@config.aws_credentials)
