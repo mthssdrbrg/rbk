@@ -1,9 +1,6 @@
 language: ruby
 sudo: false
 script: bundle exec rspec
-before_script:
-  - git config --global user.email "nobody@example.com"
-  - git config --global user.name "Nobody Doe"
 cache:
   - bundler
 rvm:

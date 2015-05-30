@@ -4,8 +4,10 @@ require 'spec_helper'
 
 
 describe 'rbk integration test' do
-  let :run_cli do
-    Rbk::Cli.run(argv, github_repos: github_repos, s3: s3, shell: shell)
+  def run_cli(path)
+    Dir.chdir(path) do
+      Rbk::Cli.run(argv, github_repos: github_repos, s3: s3, shell: shell)
+    end
   end
 
   let :argv do
@@ -52,19 +54,19 @@ describe 'rbk integration test' do
     []
   end
 
-  def write_config_file
-    File.open('.rbk.yml', 'w+') do |f|
+  def write_config_file(path)
+    File.open(File.join(path, '.rbk.yml'), 'w+') do |f|
       f.puts(YAML.dump(config))
     end
   end
 
-  def setup_repo
-    %x(git init --bare remote-repo.git)
-
-    Dir.mkdir('spec-repo')
-    Dir.chdir('spec-repo') do
+  def setup_repo(project_dir)
+    Dir.chdir(project_dir) do
+      %x(git init --bare ../remote-repo.git)
       commands = [
         'git init',
+        'git config user.email "nobody@example.com"',
+        'git config user.name "Nobody Doe"',
         'echo "hello world" >> README',
         'git add . && git commit -m "Initial commit"',
         'git remote add origin ../remote-repo.git',
@@ -75,9 +77,14 @@ describe 'rbk integration test' do
   end
 
   def clone_archive(path, data)
-    File.open(path, 'w') { |f| f.write(data) }
-    %x(tar xzf #{path})
-    Git.clone(path.basename('.tar.gz'), path.basename('.git.tar.gz'))
+    archive_path = File.join('tmp', path.basename('.tar.gz'))
+    repo_path = File.join('tmp', path.basename('.git.tar.gz'))
+    Dir.chdir('tmp') do
+      File.open(path, 'w') { |f| f.write(data) }
+      %x(tar xzf #{path})
+    end
+    %x[git clone #{archive_path} #{repo_path} 2> /dev/null]
+    repo_path
   end
 
   before do
@@ -104,28 +111,26 @@ describe 'rbk integration test' do
     end
   end
 
-  around do |example|
-    Dir.mktmpdir do |sandbox_dir|
-      Dir.chdir(sandbox_dir) do
-        setup_repo if example.metadata[:setup_git]
-        write_config_file
-        example.call
-      end
-    end
-  end
-
   before do
-    run_cli
+    FileUtils.remove_entry_secure('tmp') if File.exists?('tmp')
+    FileUtils.mkdir_p('tmp')
+    tmpdir = Dir.mktmpdir
+    project_dir = File.join(tmpdir, 'spec-repo')
+    Dir.mkdir(project_dir)
+    setup_repo(project_dir)
+    write_config_file(tmpdir)
+    run_cli(tmpdir)
   end
 
-  it 'clones, compresses and uploads repos', setup_git: true do
+  it 'clones, compresses and uploads repos' do
     expect(uploaded_repos.size).to eq(1)
     uploaded_repos.each do |path, data|
       expect(path).to_not exist
-      cloned = clone_archive(path, data)
-      expect(cloned.log.size).to eq(1)
-      expect(cloned.log.first.message).to eq('Initial commit')
-      expect(File.read(File.join(cloned.dir.path, 'README'))).to eq("hello world\n")
+      repo_path = clone_archive(path, data)
+      logs = %x[cd #{repo_path} && git log --pretty=oneline].split("\n")
+      expect(logs.size).to eq(1)
+      expect(logs.first.split(' ', 2).last).to eq('Initial commit')
+      expect(File.read(File.join(repo_path, 'README'))).to eq("hello world\n")
     end
   end
 
