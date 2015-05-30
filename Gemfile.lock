@@ -13,6 +13,7 @@ GEM
     aws-sdk-v1 (1.64.0)
       json (~> 1.4)
       nokogiri (>= 1.4.4)
+    builder (3.2.2)
     coveralls (0.8.1)
       json (~> 1.8)
       rest-client (>= 1.6.8, < 2)
@@ -27,6 +28,9 @@ GEM
     docile (1.1.5)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
+    fakes3 (0.2.1)
+      builder
+      thor
     faraday (0.9.1)
       multipart-post (>= 1.2, < 3)
     git (1.2.9.1)
@@ -100,6 +104,7 @@ PLATFORMS
 
 DEPENDENCIES
   coveralls
+  fakes3
   rake
   rbk!
   rspec

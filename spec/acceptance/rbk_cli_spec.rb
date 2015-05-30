@@ -24,6 +24,10 @@ describe 'bin/rbk' do
     @project_dir ||= File.join(tmpdir, 'spec-repo')
   end
 
+  def s3_dir
+    @s3_dir ||= File.join(tmpdir, 's3')
+  end
+
   def write_config_file(path)
     File.open(File.join(path, '.rbk.yml'), 'w') do |f|
       f.puts(YAML.dump(config))
@@ -62,7 +66,14 @@ describe 'bin/rbk' do
   end
 
   let :s3 do
-    double(:s3)
+    AWS::S3.new({
+      access_key_id: 'ACCESS_KEY_ID',
+      secret_access_key: 'SECRET_ACCESS_KEY',
+      s3_port: 5000,
+      s3_endpoint: 'localhost',
+      s3_force_path_style: true,
+      use_ssl: false,
+    })
   end
 
   let :config do
@@ -74,14 +85,18 @@ describe 'bin/rbk' do
   end
 
   let :shell do
-    Rbk::Shell.new(false, stream)
+    Rbk::Shell.new(false, stdout)
   end
 
   let :uploaded_repos do
-    []
+    bucket = s3.buckets['spec-bucket']
+    bucket.objects.map do |object|
+      path = Pathname.new(object.key).basename
+      [path, object.read]
+    end
   end
 
-  let :stream do
+  let :stdout do
     StringIO.new
   end
 
@@ -90,28 +105,23 @@ describe 'bin/rbk' do
   end
 
   before do
-    allow(s3).to receive_message_chain(:buckets, :[]).with('spec-bucket') do
-      double(:bucket).tap do |bucket|
-        allow(bucket).to receive(:name).and_return(config['bucket'])
-        allow(bucket).to receive_message_chain(:objects, :[]) do |key|
-          double(:s3_object).tap do |s3_object|
-            allow(s3_object).to receive(:key).and_return(key)
-            allow(s3_object).to receive(:exists?).and_return(false)
-            allow(s3_object).to receive(:write) do |pathname|
-              uploaded_repos << [pathname, pathname.read]
-            end
-          end
-        end
-      end
-    end
-  end
-
-  before do
     FileUtils.remove_entry_secure('tmp') if File.exists?('tmp')
     FileUtils.mkdir_p('tmp')
     FileUtils.mkdir_p(project_dir)
     setup_repo(project_dir)
     write_config_file(tmpdir)
+  end
+
+  let :s3_server do
+    Support::S3Server.new(s3_dir, 5000)
+  end
+
+  before do
+    s3_server.start
+  end
+
+  after do
+    s3_server.stop
   end
 
   context 'when given all necessary options' do
@@ -146,7 +156,7 @@ describe 'bin/rbk' do
     end
 
     it 'prints usage' do
-      expect(stream.string).to match /Usage:/
+      expect(stdout.string).to match /Usage:/
     end
   end
 

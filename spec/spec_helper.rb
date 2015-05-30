@@ -4,6 +4,8 @@ require 'stringio'
 require 'webmock'
 require 'vcr'
 
+require 'support/s3_server'
+
 
 FakeRepo = Struct.new(:name, :ssh_url)
 
@@ -15,6 +17,9 @@ end
 VCR.configure do |config|
   config.cassette_library_dir = 'spec/support/cassettes'
   config.hook_into :webmock
+  config.ignore_request do |request|
+    URI(request.uri).port == 5000
+  end
 end
 
 unless ENV['COVERAGE'] == 'no'
