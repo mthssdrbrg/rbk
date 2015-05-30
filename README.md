@@ -1,5 +1,7 @@
 # rbk
 
+[![Build Status](https://travis-ci.org/mthssdrbrg/rbk.svg?branch=master)](https://travis-ci.org/mthssdrbrg/rbk)
+
 rbk, short for "Repo BacKup", is a small tool written in Ruby that attempts to
 make it easy to backup __ALL__ repos belonging to an organization's GitHub
 account to a specific bucket on S3.
