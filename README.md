@@ -44,3 +44,7 @@ Usage: rbk [options]
         --secret-access-key=KEY      AWS secret access key
     -h, --help                       Display this screen
 ```
+
+Copyright
+
+© 2015 Mathias Söderberg, see LICENSE.txt (BSD 3-Clause).
