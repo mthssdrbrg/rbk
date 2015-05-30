@@ -1,4 +1,6 @@
 *.gem
+.ruby-*
+.rvmrc
 coverage
 pkg
 tmp
