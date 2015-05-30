@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/mthssdrbrg/rbk/badge.svg?branch=master)](https://coveralls.io/r/mthssdrbrg/rbk?branch=master)
 
 rbk, short for "Repo BacKup", is a small tool written in Ruby that attempts to
-make it easy to backup __ALL__ repos belonging to an organization's GitHub
+make it easy to backup all repos belonging to an organization's GitHub
 account to a specific bucket on S3.
 
 ## Installation
@@ -15,7 +15,7 @@ account to a specific bucket on S3.
 
 ## Usage
 
-The following example shows the easiest invocation of `rbk`:
+The following example shows the simplest invocation of `rbk`:
 
 ```
 rbk -o <organization-name> -b <s3-bucket>
@@ -27,7 +27,7 @@ This does however assume that the following environment variables are available:
 - `AWS_ACCESS_KEY_ID`
 - `AWS_SECRET_ACCESS_KEY`
 
-It is also possible to specify them as command line arguments:
+It is also possible to specify them as arguments to `rbk`:
 
 ```
 rbk -o <organization-name> -b <s3-bucket> --github-access-token=<TOKEN> --access-key-id=<KEY> --secret-access-key=<KEY>
@@ -45,6 +45,6 @@ Usage: rbk [options]
     -h, --help                       Display this screen
 ```
 
-Copyright
+## Copyright
 
 © 2015 Mathias Söderberg, see LICENSE.txt (BSD 3-Clause).
