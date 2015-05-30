@@ -1,6 +1,8 @@
 # encoding: utf-8
 
 require 'stringio'
+require 'webmock'
+require 'vcr'
 
 
 FakeRepo = Struct.new(:name, :ssh_url)
@@ -8,6 +10,11 @@ FakeRepo = Struct.new(:name, :ssh_url)
 RSpec.configure do |config|
   config.order = 'random'
   config.raise_errors_for_deprecations!
+end
+
+VCR.configure do |config|
+  config.cassette_library_dir = 'spec/support/cassettes'
+  config.hook_into :webmock
 end
 
 unless ENV['COVERAGE'] == 'no'

@@ -6,7 +6,9 @@ require 'spec_helper'
 describe 'bin/rbk' do
   def run_cli(path)
     Dir.chdir(path) do
-      @exit_status = Rbk::Cli.run(argv, github_repos: github_repos, s3: s3, shell: shell, stderr: stderr)
+      VCR.use_cassette('repos') do
+        @exit_status = Rbk::Cli.run(argv, s3: s3, shell: shell, stderr: stderr)
+      end
     end
   end
 
@@ -96,13 +98,6 @@ describe 'bin/rbk' do
   end
 
   before do
-    allow(github_repos).to receive(:new).with(oauth_token: 'GITHUB-ACCESS-TOKEN')
-      .and_return(github_repos)
-    allow(github_repos).to receive(:list).with(org: 'spec-org', auto_pagination: true)
-      .and_return(repos)
-  end
-
-  before do
     allow(s3).to receive_message_chain(:buckets, :[]).with('spec-bucket') do
       double(:bucket).tap do |bucket|
         allow(bucket).to receive(:name).and_return(config['bucket'])
@@ -183,7 +178,7 @@ describe 'bin/rbk' do
 
   context 'when any error occurs' do
     before do
-      allow(github_repos).to receive(:new).and_raise(ArgumentError)
+      allow(s3).to receive(:buckets).and_raise(ArgumentError)
       run_cli(tmpdir)
     end
 
