@@ -3,7 +3,7 @@
 module Rbk
   class Cli
     def self.run(argv=ARGV, options={})
-      new(argv, options).setup.run
+      new(argv, options).run
     end
 
     def initialize(argv, options={})
@@ -11,23 +11,28 @@ module Rbk
       @options = options
       @git = @options[:git] || Git
       @github_repos = @options[:github_repos] || Github::Repos
+      @stderr = @options[:stderr] || $stderr
     end
 
-    def setup
+    def run
       @config = Configuration.create(@argv)
+      @config.validate
       @shell = @options[:shell] || Shell.new(@config.quiet?)
       @archiver = Archiver.new(@shell)
       @s3 = @options[:s3] || AWS::S3.new(@config.aws_credentials)
       @uploader = Uploader.new(@s3.buckets[@config.bucket], @shell)
-      self
-    end
-
-    def run
       if @config.help?
         @shell.puts(@config.usage)
       else
         Backup.new(repos, git, archiver, uploader, shell).run
       end
+      0
+    rescue => e
+      @stderr.puts(%(#{e.message} (#{e.class})))
+      if e.is_a?(InsufficientOptionsError)
+        @stderr.puts(@config.usage)
+      end
+      1
     end
 
     private

@@ -4,4 +4,4 @@ $: << File.expand_path('../../lib', __FILE__)
 
 require 'rbk'
 
-Rbk::Cli.run(ARGV)
+exit(Rbk::Cli.run(ARGV))

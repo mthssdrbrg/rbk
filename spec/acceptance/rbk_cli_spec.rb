@@ -3,11 +3,23 @@
 require 'spec_helper'
 
 
-describe 'rbk integration test' do
+describe 'bin/rbk' do
   def run_cli(path)
     Dir.chdir(path) do
-      Rbk::Cli.run(argv, github_repos: github_repos, s3: s3, shell: shell)
+      @exit_status = Rbk::Cli.run(argv, github_repos: github_repos, s3: s3, shell: shell, stderr: stderr)
     end
+  end
+
+  def exit_status
+    @exit_status
+  end
+
+  def tmpdir
+    @tmpdir ||= Dir.mktmpdir
+  end
+
+  def project_dir
+    @project_dir ||= File.join(tmpdir, 'spec-repo')
   end
 
   let :argv do
@@ -52,6 +64,10 @@ describe 'rbk integration test' do
 
   let :uploaded_repos do
     []
+  end
+
+  let :stderr do
+    StringIO.new
   end
 
   def write_config_file(path)
@@ -114,23 +130,30 @@ describe 'rbk integration test' do
   before do
     FileUtils.remove_entry_secure('tmp') if File.exists?('tmp')
     FileUtils.mkdir_p('tmp')
-    tmpdir = Dir.mktmpdir
-    project_dir = File.join(tmpdir, 'spec-repo')
     Dir.mkdir(project_dir)
     setup_repo(project_dir)
     write_config_file(tmpdir)
-    run_cli(tmpdir)
   end
 
-  it 'clones, compresses and uploads repos' do
-    expect(uploaded_repos.size).to eq(1)
-    uploaded_repos.each do |path, data|
-      expect(path).to_not exist
-      repo_path = clone_archive(path, data)
-      logs = %x[cd #{repo_path} && git log --pretty=oneline].split("\n")
-      expect(logs.size).to eq(1)
-      expect(logs.first.split(' ', 2).last).to eq('Initial commit')
-      expect(File.read(File.join(repo_path, 'README'))).to eq("hello world\n")
+  context 'when given all necessary options' do
+    before do
+      run_cli(tmpdir)
+    end
+
+    it 'clones, compresses and uploads repos' do
+      expect(uploaded_repos.size).to eq(1)
+      uploaded_repos.each do |path, data|
+        expect(path).to_not exist
+        repo_path = clone_archive(path, data)
+        logs = %x[cd #{repo_path} && git log --pretty=oneline].split("\n")
+        expect(logs.size).to eq(1)
+        expect(logs.first.split(' ', 2).last).to eq('Initial commit')
+        expect(File.read(File.join(repo_path, 'README'))).to eq("hello world\n")
+      end
+    end
+
+    it 'returns 0 as exit status' do
+      expect(exit_status).to be_zero
     end
   end
 
@@ -139,8 +162,45 @@ describe 'rbk integration test' do
       %w[--help]
     end
 
+    before do
+      run_cli(tmpdir)
+    end
+
     it 'prints usage' do
       expect(messages.first).to match /Usage:/
+    end
+  end
+
+  context 'when missing any necessary option' do
+    let :config do
+      super().merge('bucket' => '')
+    end
+
+    before do
+      run_cli(tmpdir)
+    end
+
+    it 'prints usage to $stderr' do
+      expect(stderr.string).to match(/Usage:/)
+    end
+
+    it 'returns 1 as exit status' do
+      expect(exit_status).to eq(1)
+    end
+  end
+
+  context 'when any error occurs' do
+    before do
+      allow(github_repos).to receive(:new).and_raise(ArgumentError)
+      run_cli(tmpdir)
+    end
+
+    it 'prints a message to stderr' do
+      expect(stderr.string).to eq("ArgumentError (ArgumentError)\n")
+    end
+
+    it 'returns 1 as exit status' do
+      expect(exit_status).to eq(1)
     end
   end
 end

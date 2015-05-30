@@ -6,7 +6,7 @@ require 'optparse'
 module Rbk
   class Configuration
     def self.create(argv)
-      self.load.parse(argv).validate
+      self.load.parse(argv)
     end
 
     def self.load

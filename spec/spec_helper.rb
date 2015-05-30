@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+require 'stringio'
+
+
 FakeRepo = Struct.new(:name, :ssh_url)
 
 RSpec.configure do |config|

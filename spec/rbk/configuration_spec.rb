@@ -196,10 +196,6 @@ module Rbk
     end
 
     context '.create' do
-      it 'validates the resulting configuration' do
-        expect { described_class.create(%w[]) }.to raise_error(InsufficientOptionsError)
-      end
-
       context 'when there is a .rbk.yml somewhere' do
         let :config do
           described_class.create(%w[-o from-cmd-opts])
