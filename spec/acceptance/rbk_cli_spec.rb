@@ -61,10 +61,6 @@ describe 'bin/rbk' do
     %w[]
   end
 
-  let :github_repos do
-    double(:github_repos)
-  end
-
   let :s3 do
     double(:s3)
   end
@@ -75,10 +71,6 @@ describe 'bin/rbk' do
       'bucket' => 'spec-bucket',
       'organization' => 'spec-org',
     }
-  end
-
-  let :repos do
-    [FakeRepo.new('spec-repo', './spec-repo')]
   end
 
   let :shell do

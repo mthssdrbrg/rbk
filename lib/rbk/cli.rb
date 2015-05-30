@@ -10,7 +10,6 @@ module Rbk
       @argv = argv
       @options = options
       @git = @options[:git] || Git
-      @github_repos = @options[:github_repos] || Github::Repos
       @stderr = @options[:stderr] || $stderr
     end
 
@@ -41,7 +40,7 @@ module Rbk
 
     def repos
       @repos ||= begin
-        r = @github_repos.new(oauth_token: @config.github_access_token)
+        r = Github::Repos.new(oauth_token: @config.github_access_token)
         r.list(org: @config.organization, auto_pagination: true)
       end
     end
