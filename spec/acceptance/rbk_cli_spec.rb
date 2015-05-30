@@ -22,56 +22,8 @@ describe 'bin/rbk' do
     @project_dir ||= File.join(tmpdir, 'spec-repo')
   end
 
-  let :argv do
-    %w[]
-  end
-
-  let :github_repos do
-    double(:github_repos)
-  end
-
-  let :s3 do
-    double(:s3)
-  end
-
-  let :config do
-    {
-      'github_access_token' => 'GITHUB-ACCESS-TOKEN',
-      'bucket' => 'spec-bucket',
-      'organization' => 'spec-org',
-    }
-  end
-
-  let :repos do
-    [FakeRepo.new('spec-repo', './spec-repo')]
-  end
-
-  let :shell do
-    Rbk::Shell.new(false, stream)
-  end
-
-  let :stream do
-    s = double(:stream)
-    allow(s).to receive(:puts) do |message|
-      messages << message
-    end
-    s
-  end
-
-  let :messages do
-    []
-  end
-
-  let :uploaded_repos do
-    []
-  end
-
-  let :stderr do
-    StringIO.new
-  end
-
   def write_config_file(path)
-    File.open(File.join(path, '.rbk.yml'), 'w+') do |f|
+    File.open(File.join(path, '.rbk.yml'), 'w') do |f|
       f.puts(YAML.dump(config))
     end
   end
@@ -103,6 +55,46 @@ describe 'bin/rbk' do
     repo_path
   end
 
+  let :argv do
+    %w[]
+  end
+
+  let :github_repos do
+    double(:github_repos)
+  end
+
+  let :s3 do
+    double(:s3)
+  end
+
+  let :config do
+    {
+      'github_access_token' => 'GITHUB-ACCESS-TOKEN',
+      'bucket' => 'spec-bucket',
+      'organization' => 'spec-org',
+    }
+  end
+
+  let :repos do
+    [FakeRepo.new('spec-repo', './spec-repo')]
+  end
+
+  let :shell do
+    Rbk::Shell.new(false, stream)
+  end
+
+  let :uploaded_repos do
+    []
+  end
+
+  let :stream do
+    StringIO.new
+  end
+
+  let :stderr do
+    StringIO.new
+  end
+
   before do
     allow(github_repos).to receive(:new).with(oauth_token: 'GITHUB-ACCESS-TOKEN')
       .and_return(github_repos)
@@ -130,7 +122,7 @@ describe 'bin/rbk' do
   before do
     FileUtils.remove_entry_secure('tmp') if File.exists?('tmp')
     FileUtils.mkdir_p('tmp')
-    Dir.mkdir(project_dir)
+    FileUtils.mkdir_p(project_dir)
     setup_repo(project_dir)
     write_config_file(tmpdir)
   end
@@ -167,13 +159,13 @@ describe 'bin/rbk' do
     end
 
     it 'prints usage' do
-      expect(messages.first).to match /Usage:/
+      expect(stream.string).to match /Usage:/
     end
   end
 
   context 'when missing any necessary option' do
     let :config do
-      super().merge('bucket' => '')
+      {'bucket' => 'hello-world'}
     end
 
     before do
