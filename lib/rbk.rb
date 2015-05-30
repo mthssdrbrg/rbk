@@ -1,6 +1,6 @@
 # encoding: utf-8
 
-require 'aws-sdk'
+require 'aws-sdk-v1'
 require 'git'
 require 'github_api'
 require 'fileutils'
