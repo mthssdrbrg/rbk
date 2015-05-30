@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.require_paths = %w[lib]
 
   s.add_runtime_dependency 'aws-sdk-v1', '~> 1.64'
-  s.add_runtime_dependency 'github_api', '~> 0.11'
+  s.add_runtime_dependency 'github_api', '~> 0.11', '< 0.12'
   s.add_runtime_dependency 'git', '~> 1.2'
 
   s.platform = Gem::Platform::RUBY
