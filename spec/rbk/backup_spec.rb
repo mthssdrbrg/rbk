@@ -15,7 +15,7 @@ module Rbk
       end
 
       let :git do
-        double(:git)
+        double(:git, clone: nil)
       end
 
       let :archiver do
@@ -23,26 +23,22 @@ module Rbk
       end
 
       let :uploader do
-        double(:uploader)
+        double(:uploader, upload: nil)
       end
 
       let :shell do
-        double(:shell)
+        double(:shell, puts: nil)
       end
 
       let :fileutils do
-        double(:fileutils)
+        double(:fileutils, remove_entry_secure: nil)
       end
 
       before do
-        repos.stub(:each).and_yield(FakeRepo.new('repo', 'http://github.com/org/repo.git'))
-        git.stub(:clone)
-        archiver.stub(:create) do |path|
+        allow(repos).to receive(:each).and_yield(FakeRepo.new('repo', 'http://github.com/org/repo.git'))
+        allow(archiver).to receive(:create) do |path|
           %(#{path}.tar.gz)
         end
-        uploader.stub(:upload)
-        fileutils.stub(:remove_entry_secure)
-        shell.stub(:puts)
       end
 
       context 'without any errors' do
@@ -81,11 +77,13 @@ module Rbk
 
       context 'errors during Git#clone' do
         before do
-          repos.stub(:each)
+          allow(repos).to receive(:each)
             .and_yield(FakeRepo.new('fail-repo', 'git@github.com/org/fail-repo.git'))
             .and_yield(FakeRepo.new('repo', 'git@github.com/org/repo.git'))
 
-            git.stub(:clone).with('git@github.com/org/fail-repo.git', anything, anything).and_raise(Git::GitExecuteError)
+          allow(git).to receive(:clone)
+            .with('git@github.com/org/fail-repo.git', anything, anything)
+            .and_raise(Git::GitExecuteError)
         end
 
         before do

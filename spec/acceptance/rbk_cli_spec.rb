@@ -40,7 +40,7 @@ describe 'rbk integration test' do
 
   let :stream do
     s = double(:stream)
-    s.stub(:puts) do |message|
+    allow(s).to receive(:puts) do |message|
       messages << message
     end
     s
@@ -88,21 +88,21 @@ describe 'rbk integration test' do
   end
 
   before do
-    github_repos.stub(:new).with(oauth_token: 'GITHUB-ACCESS-TOKEN')
+    allow(github_repos).to receive(:new).with(oauth_token: 'GITHUB-ACCESS-TOKEN')
       .and_return(github_repos)
-    github_repos.stub(:list).with(org: 'spec-org', auto_pagination: true)
+    allow(github_repos).to receive(:list).with(org: 'spec-org', auto_pagination: true)
       .and_return(repos)
   end
 
   before do
-    s3.stub_chain(:buckets, :[]).with('spec-bucket') do
+    allow(s3).to receive_message_chain(:buckets, :[]).with('spec-bucket') do
       double(:bucket).tap do |bucket|
-        bucket.stub(:name).and_return(config['bucket'])
-        bucket.stub_chain(:objects, :[]) do |key|
+        allow(bucket).to receive(:name).and_return(config['bucket'])
+        allow(bucket).to receive_message_chain(:objects, :[]) do |key|
           double(:s3_object).tap do |s3_object|
-            s3_object.stub(:key).and_return(key)
-            s3_object.stub(:exists?).and_return(false)
-            s3_object.stub(:write) do |pathname|
+            allow(s3_object).to receive(:key).and_return(key)
+            allow(s3_object).to receive(:exists?).and_return(false)
+            allow(s3_object).to receive(:write) do |pathname|
               uploaded_repos << [pathname, pathname.read]
             end
           end

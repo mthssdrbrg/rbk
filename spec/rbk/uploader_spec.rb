@@ -22,8 +22,8 @@ module Rbk
     end
 
     before do
-      bucket.stub_chain(:objects, :[]) do |key|
-        s3_object.stub(:key).and_return(key)
+      allow(bucket).to receive_message_chain(:objects, :[]) do |key|
+        allow(s3_object).to receive(:key).and_return(key)
         s3_object
       end
     end
@@ -31,7 +31,7 @@ module Rbk
     describe '#upload' do
       context 'when file already exists on S3' do
         before do
-          s3_object.stub(:exists?).and_return(true)
+          allow(s3_object).to receive(:exists?).and_return(true)
         end
 
         before do
