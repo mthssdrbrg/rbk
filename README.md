@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/mthssdrbrg/rbk.svg?branch=master)](https://travis-ci.org/mthssdrbrg/rbk)
 [![Coverage Status](https://coveralls.io/repos/mthssdrbrg/rbk/badge.svg?branch=master)](https://coveralls.io/r/mthssdrbrg/rbk?branch=master)
+[![Gem Version](https://badge.fury.io/rb/rbk.svg)](http://badge.fury.io/rb/rbk)
 
 rbk, short for "Repo BacKup", is a small tool written in Ruby that attempts to
 make it easy to backup all repos belonging to an organization's GitHub
