@@ -4,7 +4,7 @@ PATH
     rbk (0.1.0)
       aws-sdk-v1 (~> 1.64)
       git (~> 1.2)
-      github_api (~> 0.12)
+      github_api (~> 0.11)
 
 GEM
   remote: https://rubygems.org/

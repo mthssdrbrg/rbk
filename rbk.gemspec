@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.executables   = %w[rbk]
 
   s.add_dependency 'aws-sdk-v1', '~> 1.64'
-  s.add_dependency 'github_api', '~> 0.12'
+  s.add_dependency 'github_api', '~> 0.11'
   s.add_dependency 'git', '~> 1.2'
 
   s.platform = Gem::Platform::RUBY
