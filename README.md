@@ -10,16 +10,16 @@ account to a specific bucket on S3.
 
 ## Installation
 
-```
-[sudo] gem install rbk
+```shell
+$ [sudo] gem install rbk
 ```
 
 ## Usage
 
 The following example shows the simplest invocation of `rbk`:
 
-```
-rbk -o <organization-name> -b <s3-bucket>
+```shell
+$ rbk -o <organization-name> -b <s3-bucket>
 ```
 
 This does however assume that the following environment variables are available:
@@ -30,13 +30,14 @@ This does however assume that the following environment variables are available:
 
 It is also possible to specify them as arguments to `rbk`:
 
-```
-rbk -o <organization-name> -b <s3-bucket> --github-access-token=<TOKEN> --access-key-id=<KEY> --secret-access-key=<KEY>
+```shell
+$ rbk -o <organization-name> -b <s3-bucket> --github-access-token=<TOKEN> --access-key-id=<KEY> --secret-access-key=<KEY>
 ```
 
 See `rbk -h` for further usage:
 
-```
+```shell
+$ rbk -h
 Usage: rbk [options]
     -o, --organization=NAME          (GitHub) Organization name
     -b, --bucket=NAME                S3 bucket where to store backups
