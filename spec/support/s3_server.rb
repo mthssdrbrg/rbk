@@ -48,11 +48,29 @@ module Support
         @server.mount '/', FakeS3::Servlet, @store, 'localhost'
         @server.start
       end
+      wait_for_server_start
     end
 
     def stop
       @server.shutdown
       @thread.join
+    end
+
+    private
+
+    def wait_for_server_start(max_attempts=10)
+      attempts = 0
+      begin
+        RestClient.get('http://localhost:5000')
+      rescue RestClient::Exception
+        attempts += 1
+        if attempts > max_attempts
+          fail('Server did not start!')
+        else
+          sleep(0.1)
+          retry
+        end
+      end
     end
   end
 end
