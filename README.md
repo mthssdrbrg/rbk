@@ -31,19 +31,19 @@ This does however assume that the following environment variables are available:
 It is also possible to specify them as arguments to `rbk`:
 
 ```shell
-$ rbk -o <organization-name> -b <s3-bucket> --github-access-token=<TOKEN> --access-key-id=<KEY> --secret-access-key=<KEY>
+$ rbk -o <organization-name> -b <s3-bucket> -G <GITHUB_TOKEN> -A <ACCESS_KEY> -S <SECRET_KEY>
 ```
 
 See `rbk -h` for further usage:
 
 ```shell
-$ rbk -h
 Usage: rbk [options]
     -o, --organization=NAME          (GitHub) Organization name
     -b, --bucket=NAME                S3 bucket where to store backups
-        --github-access-token=TOKEN  GitHub access token
-        --access-key-id=KEY          AWS access key id
-        --secret-access-key=KEY      AWS secret access key
+    -G, --github-access-token=TOKEN  GitHub access token
+    -A, --access-key-id=KEY          AWS access key id
+    -S, --secret-access-key=KEY      AWS secret access key
+    -q, --quiet                      Be quiet and mind your own business
     -h, --help                       Display this screen
 ```
 
