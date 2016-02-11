@@ -49,4 +49,4 @@ Usage: rbk [options]
 
 ## Copyright
 
-© 2015 Mathias Söderberg, see LICENSE.txt (BSD 3-Clause).
+© 2015-2016 Mathias Söderberg, see LICENSE.txt (BSD 3-Clause).
